@@ -1,0 +1,285 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+:root{--green:#1D9E75;--green-light:#E1F5EE;--green-dark:#0F6E56;--red:#E24B4A}
+#app{display:flex;height:100vh;min-height:600px;background:var(--color-background-tertiary);gap:0}
+#left{flex:1;display:flex;flex-direction:column;padding:12px;gap:10px;overflow:hidden}
+#right{width:320px;background:var(--color-background-primary);border-left:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+
+.topbar{display:flex;gap:8px;align-items:center}
+.topbar input{flex:1;padding:8px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:14px;background:var(--color-background-primary);color:var(--color-text-primary)}
+.topbar input:focus{outline:none;border-color:#1D9E75}
+
+.cats{display:flex;gap:6px;flex-wrap:wrap}
+.cat{padding:5px 14px;border-radius:20px;font-size:12px;border:0.5px solid var(--color-border-secondary);cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:.15s}
+.cat.active,.cat:hover{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;overflow-y:auto;flex:1;padding-right:2px}
+.grid::-webkit-scrollbar{width:4px}.grid::-webkit-scrollbar-thumb{background:var(--color-border-secondary);border-radius:2px}
+
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:4px}
+.card:hover{border-color:#5DCAA5;background:#E1F5EE}
+.card.no-stock{opacity:.5;cursor:not-allowed}
+.card .icon{font-size:20px;margin-bottom:2px}
+.card .name{font-size:12px;font-weight:500;color:var(--color-text-primary);line-height:1.3}
+.card .lab{font-size:11px;color:var(--color-text-secondary)}
+.card .price{font-size:14px;font-weight:500;color:#0F6E56;margin-top:4px}
+.card .stock{font-size:11px;color:var(--color-text-secondary)}
+
+#right-header{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+#right-header h2{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
+#right-header p{font-size:12px;color:var(--color-text-secondary)}
+
+#cart-items{flex:1;overflow-y:auto;padding:8px}
+#cart-items::-webkit-scrollbar{width:4px}.#cart-items::-webkit-scrollbar-thumb{background:var(--color-border-secondary)}
+
+.cart-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--border-radius-md);margin-bottom:4px;background:var(--color-background-secondary)}
+.cart-item .ci-name{flex:1;font-size:12px;font-weight:500;color:var(--color-text-primary);line-height:1.3}
+.cart-item .ci-price{font-size:12px;color:var(--color-text-secondary)}
+.qty-ctrl{display:flex;align-items:center;gap:4px}
+.qty-btn{width:22px;height:22px;border-radius:50%;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--color-text-primary);line-height:1}
+.qty-btn:hover{background:#E1F5EE;border-color:#5DCAA5;color:#0F6E56}
+.qty-num{font-size:12px;font-weight:500;min-width:16px;text-align:center;color:var(--color-text-primary)}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);font-size:16px;padding:2px}
+.del-btn:hover{color:var(--red)}
+
+.empty-cart{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--color-text-secondary)}
+.empty-cart i{font-size:32px}
+.empty-cart p{font-size:13px}
+
+#cart-footer{padding:12px 16px;border-top:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;gap:8px}
+.total-row{display:flex;justify-content:space-between;font-size:13px;color:var(--color-text-secondary)}
+.total-row.big{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.discount-row{display:flex;gap:6px}
+.discount-row input{flex:1;padding:6px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:12px;background:var(--color-background-primary);color:var(--color-text-primary)}
+.discount-row button{padding:6px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;background:var(--color-background-secondary);color:var(--color-text-primary)}
+.discount-row button:hover{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5}
+
+.pay-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pay-btn{padding:8px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);font-size:12px;cursor:pointer;background:var(--color-background-secondary);color:var(--color-text-primary);transition:.15s}
+.pay-btn:hover,.pay-btn.selected{background:#E1F5EE;border-color:#5DCAA5;color:#0F6E56}
+
+.checkout-btn{padding:12px;background:#1D9E75;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer;transition:.15s;width:100%}
+.checkout-btn:hover{background:#0F6E56}
+.checkout-btn:disabled{opacity:.5;cursor:not-allowed}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;padding:10px 20px;border-radius:var(--border-radius-md);font-size:13px;opacity:0;pointer-events:none;transition:.3s;z-index:999}
+.toast.show{opacity:1}
+
+.badge-rx{font-size:10px;padding:2px 6px;border-radius:10px;background:#FAEEDA;color:#633806;border:0.5px solid #FAC775}
+.badge-gen{font-size:10px;padding:2px 6px;border-radius:10px;background:#E1F5EE;color:#085041;border:0.5px solid #5DCAA5}
+</style>
+
+<h2 class="sr-only">PDV Farmácia — sistema de ponto de venda com catálogo de produtos e carrinho de compras</h2>
+
+<div id="app">
+<div id="left">
+  <div class="topbar">
+    <i class="ti ti-pills" style="font-size:20px;color:#1D9E75" aria-hidden="true"></i>
+    <input type="text" id="search" placeholder="Buscar medicamento, laboratório..." />
+    <span style="font-size:12px;color:var(--color-text-secondary);white-space:nowrap" id="clock"></span>
+  </div>
+  <div class="cats" id="cats"></div>
+  <div class="grid" id="grid"></div>
+</div>
+<div id="right">
+  <div id="right-header">
+    <h2><i class="ti ti-receipt" style="font-size:16px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>Venda atual</h2>
+    <p id="item-count">Nenhum item</p>
+  </div>
+  <div id="cart-items">
+    <div class="empty-cart" id="empty-msg">
+      <i class="ti ti-shopping-cart" aria-hidden="true"></i>
+      <p>Carrinho vazio</p>
+    </div>
+  </div>
+  <div id="cart-footer">
+    <div class="total-row"><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
+    <div class="discount-row">
+      <input type="number" id="disc-input" placeholder="Desconto %" min="0" max="100"/>
+      <button onclick="applyDiscount()">Aplicar</button>
+    </div>
+    <div class="total-row"><span>Desconto</span><span id="disc-val" style="color:#E24B4A">- R$ 0,00</span></div>
+    <div class="total-row big"><span>Total</span><span id="total">R$ 0,00</span></div>
+    <div class="pay-btns">
+      <button class="pay-btn selected" id="p-dinheiro" onclick="setPay('dinheiro')"><i class="ti ti-cash" aria-hidden="true"></i> Dinheiro</button>
+      <button class="pay-btn" id="p-debito" onclick="setPay('debito')"><i class="ti ti-credit-card" aria-hidden="true"></i> Débito</button>
+      <button class="pay-btn" id="p-credito" onclick="setPay('credito')"><i class="ti ti-credit-card" aria-hidden="true"></i> Crédito</button>
+      <button class="pay-btn" id="p-pix" onclick="setPay('pix')"><i class="ti ti-qrcode" aria-hidden="true"></i> PIX</button>
+    </div>
+    <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>Finalizar venda</button>
+    <button style="background:none;border:none;font-size:12px;color:var(--color-text-secondary);cursor:pointer;text-align:center" onclick="clearCart()">Limpar carrinho</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const produtos=[
+{id:1,nome:'Dipirona 500mg',lab:'EMS',cat:'Analgésicos',preco:8.90,estoque:120,tipo:'generico',icon:'💊'},
+{id:2,nome:'Paracetamol 750mg',lab:'Medley',cat:'Analgésicos',preco:6.50,estoque:80,tipo:'generico',icon:'💊'},
+{id:3,nome:'Ibuprofeno 400mg',lab:'Legrand',cat:'Analgésicos',preco:12.90,estoque:60,tipo:'generico',icon:'💊'},
+{id:4,nome:'Amoxicilina 500mg',lab:'Eurofarma',cat:'Antibióticos',preco:24.90,estoque:35,tipo:'tarja',icon:'💊'},
+{id:5,nome:'Azitromicina 500mg',lab:'EMS',cat:'Antibióticos',preco:32.50,estoque:20,tipo:'tarja',icon:'💊'},
+{id:6,nome:'Omeprazol 20mg',lab:'Medley',cat:'Digestivos',preco:14.90,estoque:90,tipo:'generico',icon:'💊'},
+{id:7,nome:'Ranitidina 150mg',lab:'Legrand',cat:'Digestivos',preco:11.20,estoque:45,tipo:'generico',icon:'💊'},
+{id:8,nome:'Vitamina C 1g',lab:'Cimed',cat:'Vitaminas',preco:18.90,estoque:200,tipo:'livre',icon:'🍊'},
+{id:9,nome:'Complexo B',lab:'Natulab',cat:'Vitaminas',preco:22.00,estoque:150,tipo:'livre',icon:'🟡'},
+{id:10,nome:'Vitamina D 2000UI',lab:'Sundown',cat:'Vitaminas',preco:34.90,estoque:75,tipo:'livre',icon:'☀️'},
+{id:11,nome:'Loratadina 10mg',lab:'EMS',cat:'Alérgicos',preco:9.90,estoque:65,tipo:'generico',icon:'💊'},
+{id:12,nome:'Cetirizina 10mg',lab:'Legrand',cat:'Alérgicos',preco:11.50,estoque:50,tipo:'generico',icon:'💊'},
+{id:13,nome:'Álcool Gel 70% 500ml',lab:'Farmax',cat:'Higiene',preco:12.90,estoque:300,tipo:'livre',icon:'🧴'},
+{id:14,nome:'Protetor Solar FPS60',lab:'Sundown',cat:'Higiene',preco:45.90,estoque:40,tipo:'livre',icon:'☀️'},
+{id:15,nome:'Curativo Band-Aid',lab:'J&J',cat:'Higiene',preco:7.90,estoque:180,tipo:'livre',icon:'🩹'},
+{id:16,nome:'Neosaldina',lab:'Takeda',cat:'Analgésicos',preco:16.90,estoque:55,tipo:'livre',icon:'💊'},
+{id:17,nome:'Melatonina 0.21mg',lab:'Cimed',cat:'Vitaminas',preco:28.90,estoque:60,tipo:'livre',icon:'🌙'},
+{id:18,nome:'Soro Fisiológico 500ml',lab:'Equiplex',cat:'Soro',preco:9.50,estoque:90,tipo:'livre',icon:'💧'},
+];
+
+const cats=['Todos','Analgésicos','Antibióticos','Digestivos','Vitaminas','Alérgicos','Higiene','Soro'];
+let cart={};
+let catAtual='Todos';
+let discPct=0;
+let pagamento='dinheiro';
+let busca='';
+
+function renderCats(){
+  const el=document.getElementById('cats');
+  el.innerHTML=cats.map(c=>`<button class="cat${c===catAtual?' active':''}" onclick="setCat('${c}')">${c}</button>`).join('');
+}
+
+function setCat(c){catAtual=c;renderGrid()}
+
+function renderGrid(){
+  const q=busca.toLowerCase();
+  let lista=produtos.filter(p=>{
+    const matchCat=catAtual==='Todos'||p.cat===catAtual;
+    const matchQ=!q||p.nome.toLowerCase().includes(q)||p.lab.toLowerCase().includes(q);
+    return matchCat&&matchQ;
+  });
+  const el=document.getElementById('grid');
+  if(!lista.length){el.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--color-text-secondary);font-size:13px">Nenhum produto encontrado</div>';return;}
+  el.innerHTML=lista.map(p=>`
+    <div class="card${p.estoque===0?' no-stock':''}" onclick="${p.estoque>0?`addItem(${p.id})`:''}" title="${p.nome}">
+      <span class="icon">${p.icon}</span>
+      <span class="name">${p.nome}</span>
+      <span class="lab">${p.lab}</span>
+      <span class="${p.tipo==='tarja'?'badge-rx':'badge-gen'}">${p.tipo==='tarja'?'⚠ Receita':p.tipo==='generico'?'Genérico':'Livre'}</span>
+      <span class="price">R$ ${p.preco.toFixed(2).replace('.',',')}</span>
+      <span class="stock">Estoque: ${p.estoque}</span>
+    </div>`).join('');
+}
+
+function addItem(id){
+  const p=produtos.find(x=>x.id===id);
+  if(!p||p.estoque===0)return;
+  if(cart[id]){
+    if(cart[id].qty>=p.estoque){showToast('Estoque máximo atingido!');return;}
+    cart[id].qty++;
+  } else {
+    cart[id]={...p,qty:1};
+  }
+  renderCart();
+  showToast(`${p.nome} adicionado`);
+}
+
+function changeQty(id,delta){
+  if(!cart[id])return;
+  const p=produtos.find(x=>x.id===id);
+  cart[id].qty+=delta;
+  if(cart[id].qty<=0){delete cart[id];}
+  else if(p&&cart[id].qty>p.estoque){cart[id].qty=p.estoque;}
+  renderCart();
+}
+
+function removeItem(id){delete cart[id];renderCart();}
+
+function clearCart(){cart={};discPct=0;document.getElementById('disc-input').value='';renderCart();}
+
+function renderCart(){
+  const items=Object.values(cart);
+  const el=document.getElementById('cart-items');
+  const emptyMsg=document.getElementById('empty-msg');
+  const n=items.reduce((a,i)=>a+i.qty,0);
+  document.getElementById('item-count').textContent=n?`${n} item${n>1?'s':''}`:' Nenhum item';
+  if(!items.length){
+    el.innerHTML='<div class="empty-cart" id="empty-msg"><i class="ti ti-shopping-cart" aria-hidden="true"></i><p>Carrinho vazio</p></div>';
+    updateTotals();return;
+  }
+  el.innerHTML=items.map(i=>`
+    <div class="cart-item">
+      <div style="flex:1">
+        <div class="ci-name">${i.nome}</div>
+        <div class="ci-price">R$ ${i.preco.toFixed(2).replace('.',',')}</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(${i.id},-1)">−</button>
+        <span class="qty-num">${i.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${i.id},1)">+</button>
+      </div>
+      <button class="del-btn" onclick="removeItem(${i.id})"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>`).join('');
+  updateTotals();
+}
+
+function updateTotals(){
+  const items=Object.values(cart);
+  const sub=items.reduce((a,i)=>a+i.preco*i.qty,0);
+  const disc=sub*discPct/100;
+  const total=sub-disc;
+  const fmt=v=>'R$ '+v.toFixed(2).replace('.',',');
+  document.getElementById('subtotal').textContent=fmt(sub);
+  document.getElementById('disc-val').textContent='- '+fmt(disc);
+  document.getElementById('total').textContent=fmt(total);
+  document.getElementById('checkout-btn').disabled=items.length===0;
+}
+
+function applyDiscount(){
+  const v=parseFloat(document.getElementById('disc-input').value)||0;
+  discPct=Math.min(Math.max(v,0),100);
+  updateTotals();
+  showToast(`Desconto de ${Math.round(discPct)}% aplicado`);
+}
+
+function setPay(p){
+  pagamento=p;
+  ['dinheiro','debito','credito','pix'].forEach(x=>{
+    document.getElementById('p-'+x).classList.toggle('selected',x===p);
+  });
+}
+
+function checkout(){
+  const items=Object.values(cart);
+  if(!items.length)return;
+  const items_count=items.reduce((a,i)=>a+i.qty,0);
+  items.forEach(i=>{const p=produtos.find(x=>x.id===i.id);if(p)p.estoque-=i.qty;});
+  showToast(`✓ Venda finalizada! ${items_count} item(s) — ${pagamento.charAt(0).toUpperCase()+pagamento.slice(1)}`);
+  clearCart();
+  renderGrid();
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+
+document.getElementById('search').addEventListener('input',e=>{busca=e.target.value;renderGrid();});
+document.getElementById('cats').addEventListener('click',e=>{
+  const btn=e.target.closest('.cat');if(!btn)return;
+  catAtual=btn.textContent;
+  document.querySelectorAll('.cat').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+});
+
+renderCats();renderGrid();renderCart();updateClock();
+setInterval(updateClock,1000);
+</script>
